@@ -1,0 +1,42 @@
+{% extends 'legislative/base.html' %}
+
+{% block title %}Legislators - Quorum Legislative Data{% endblock %}
+
+{% block header %}Legislators{% endblock %}
+{% block subtitle %}How many bills did each legislator support or oppose?{% endblock %}
+
+{% block content %}
+<h2>Legislator Voting Statistics</h2>
+<p>Click on any legislator's name to see detailed voting history.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Legislator</th>
+            <th>Supported Bills</th>
+            <th>Opposed Bills</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for legislator in legislators %}
+        <tr>
+            <td>{{ legislator.id }}</td>
+            <td>
+                <a href="{% url 'legislator_detail' legislator.id %}" class="detail-link">
+                    {{ legislator.name }}
+                </a>
+            </td>
+            <td><span class="support">{{ legislator.supported_bills_count_annotated|default:legislator.supported_bills_count }}</span></td>
+            <td><span class="oppose">{{ legislator.opposed_bills_count_annotated|default:legislator.opposed_bills_count }}</span></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align: center; color: #6c757d; padding: 40px;">
+                No legislators found. Run <code>python manage.py load_data</code> to load data.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

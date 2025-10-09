@@ -5,7 +5,20 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
-addopts = "--cov=legislative --cov-report=term-missing --verbose"
+python_classes = ["Test*", "*Test", "*Tests"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--reuse-db",
+]
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+]
+testpaths = ["tests"]
 
 [tool.black]
 line-length = 88

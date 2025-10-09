@@ -1,0 +1,44 @@
+{% extends 'legislative/base.html' %}
+
+{% block title %}Bills - Quorum Legislative Data{% endblock %}
+
+{% block header %}Bills{% endblock %}
+{% block subtitle %}How many legislators supported or opposed each bill?{% endblock %}
+
+{% block content %}
+<h2>Bill Voting Statistics</h2>
+<p>Click on any bill's title to see detailed voting breakdown.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Bill</th>
+            <th>Supporters</th>
+            <th>Opposers</th>
+            <th>Primary Sponsor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bill in bills %}
+        <tr>
+            <td>{{ bill.id }}</td>
+            <td>
+                <a href="{% url 'bill_detail' bill.id %}" class="detail-link">
+                    {{ bill.title }}
+                </a>
+            </td>
+            <td><span class="support">{{ bill.supporters_count_annotated|default:bill.supporters_count }}</span></td>
+            <td><span class="oppose">{{ bill.opposers_count_annotated|default:bill.opposers_count }}</span></td>
+            <td>{{ bill.primary_sponsor.name }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align: center; color: #6c757d; padding: 40px;">
+                No bills found. Run <code>python manage.py load_data</code> to load data.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

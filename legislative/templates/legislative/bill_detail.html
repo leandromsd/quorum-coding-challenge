@@ -1,0 +1,77 @@
+{% extends 'legislative/base.html' %}
+
+{% block title %}{{ bill.title }} - Quorum Legislative Data{% endblock %}
+
+{% block header %}{{ bill.title }}{% endblock %}
+{% block subtitle %}Detailed voting breakdown{% endblock %}
+
+{% block content %}
+<a href="{% url 'bills' %}" class="back-link">← Back to Bills</a>
+
+<div>
+    <h1>{{ bill.title }}</h1>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-number support">{{ bill.supporters_count }}</div>
+        <div class="stat-label">Supporters</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number oppose">{{ bill.opposers_count }}</div>
+        <div class="stat-label">Opposers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ bill.supporters_count|add:bill.opposers_count }}</div>
+        <div class="stat-label">Total Votes</div>
+    </div>
+</div>
+
+<div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
+    <h3>Bill Information</h3>
+    <p><strong>Bill ID:</strong> {{ bill.id }}</p>
+    <p><strong>Primary Sponsor:</strong> 
+        <a href="{% url 'legislator_detail' bill.primary_sponsor.id %}" class="detail-link">
+            {{ bill.primary_sponsor.name }}
+        </a>
+    </p>
+</div>
+
+<div class="vote-details">
+    <h3>How Legislators Voted</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Legislator</th>
+                <th>Vote</th>
+                <th>Legislator ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vote_result in vote_results %}
+            <tr>
+                <td>
+                    <a href="{% url 'legislator_detail' vote_result.legislator.id %}" class="detail-link">
+                        {{ vote_result.legislator.name }}
+                    </a>
+                </td>
+                <td>
+                    {% if vote_result.is_support %}
+                        <span class="support">✓ Supported</span>
+                    {% else %}
+                        <span class="oppose">✗ Opposed</span>
+                    {% endif %}
+                </td>
+                <td>{{ vote_result.legislator.id }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center; color: #6c757d; padding: 40px;">
+                    No votes found for this bill.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

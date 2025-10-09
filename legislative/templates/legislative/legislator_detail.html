@@ -1,0 +1,67 @@
+{% extends 'legislative/base.html' %}
+
+{% block title %}{{ legislator.name }} - Quorum Legislative Data{% endblock %}
+
+{% block header %}{{ legislator.name }}{% endblock %}
+{% block subtitle %}Detailed voting history{% endblock %}
+
+{% block content %}
+<a href="{% url 'legislators' %}" class="back-link">← Back to Legislators</a>
+
+<div>
+    <h1>{{ legislator.name }}</h1>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-number support">{{ legislator.supported_bills_count }}</div>
+        <div class="stat-label">Bills Supported</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number oppose">{{ legislator.opposed_bills_count }}</div>
+        <div class="stat-label">Bills Opposed</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ legislator.supported_bills_count|add:legislator.opposed_bills_count }}</div>
+        <div class="stat-label">Total Votes</div>
+    </div>
+</div>
+
+<div class="vote-details">
+    <h3>Voting History</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Bill</th>
+                <th>Vote</th>
+                <th>Bill ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vote_result in legislator.vote_results.all %}
+            <tr>
+                <td>
+                    <a href="{% url 'bill_detail' vote_result.vote.bill.id %}" class="detail-link">
+                        {{ vote_result.vote.bill.title }}
+                    </a>
+                </td>
+                <td>
+                    {% if vote_result.is_support %}
+                        <span class="support">✓ Supported</span>
+                    {% else %}
+                        <span class="oppose">✗ Opposed</span>
+                    {% endif %}
+                </td>
+                <td>{{ vote_result.vote.bill.id }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center; color: #6c757d; padding: 40px;">
+                    No voting history found for this legislator.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

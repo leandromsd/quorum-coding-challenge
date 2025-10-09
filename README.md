@@ -1,134 +1,57 @@
-# Quorum Legislative Data System
+# Quorum Legislative Data
 
-A Django application for processing and displaying legislative voting data from CSV files.
+Django app that loads legislative data from CSVs into SQLite and exposes it via REST APIs and a simple web UI.
 
-## Project Overview
+## Run
 
-This application will process legislative data from CSV files to provide insights about voting patterns. Currently in initial setup phase.
+- Requirements: Python 3.10+, pip
+- Optional: Makefile shortcuts
 
-## Technology Stack
+Using Makefile (recommended):
+- `make setup` (create venv, install deps, migrate, load CSVs)
+- `make server` (start at http://localhost:8000)
 
-- **Backend**: Django 5
-- **Data Processing**: Pandas for CSV handling
-- **Testing**: pytest with Django integration
-- **Code Quality**: black, isort, flake8
+Manual:
+- `python3 -m venv .venv && source .venv/bin/activate`
+- `pip install --upgrade pip && pip install -r requirements.txt`
+- `python manage.py migrate`
+- `python manage.py load_data`  # imports CSVs from `csv_data/` by default
+- `python manage.py runserver`
 
-## Project Structure
+## CSV Loading
 
-```
-quorum-coding-challenge/
-├── manage.py
-├── requirements.txt
-├── .env.example
-├── core/                      # Main Django project
-├── legislative/               # Main app (to be implemented)
-│   ├── models.py              # Django models
-│   ├── views.py               # Views
-│   └── templates/             # HTML templates
-├── csv_data/                  # CSV files directory
-├── tests/                     # Test files
-└── .venv/                     # Virtual environment
-```
+- Default directory: `csv_data/` (override with `--csv-dir`)
+- Files required: `legislators.csv`, `bills.csv`, `votes.csv`, `vote_results.csv`
+- Validation: the loader raises clear errors if references are missing or columns are invalid, e.g.:
+  - "Primary sponsor with id=XXX not found (from bills.csv)."
+  - "Bill with id=YYY not found (from votes.csv)."
+  - "Invalid vote_type 'Z' for vote_result id=ID (expected 1 or 2)."
 
-## Quick Start
+## API
 
-### Prerequisites
-- Python 3.10+
-- pip
+- Root: `GET /api/`
+- Stats: `GET /api/stats/`
+- Legislators: `GET /api/legislators/`, `GET /api/legislators/{id}/`
+- Bills: `GET /api/bills/`, `GET /api/bills/{id}/`
 
-### Installation
+Pagination: disabled (all results returned).
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/leandromsd/quorum-coding-challenge.git
-   cd quorum-coding-challenge
-   ```
+## Web UI
 
-2. **Create and activate virtual environment**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+- Home: `/` (overview stats)
+- Legislators: `/legislators/` (counts per legislator)
+- Bills: `/bills/` (counts and primary sponsor per bill)
+- Detail pages for each legislator and bill
 
-3. **Install dependencies**
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
+## Tests & Lint
 
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+- `make test` or `pytest -q`
+- Coverage: `make test-coverage`
+- Lint/format: `make lint` or `make fix`
 
-5. **Run migrations and start server**
-   ```bash
-   python manage.py migrate
-   python manage.py runserver
-   ```
+## Project Layout
 
-6. **Access the application**
-   - Django welcome page: http://localhost:8000/
-
-## Development Status
-
-✅ **Phase 1 - Project Setup** (Completed)
-- Django project structure
-- Development environment configuration
-- Code quality tools setup
-
-🔄 **Phase 2 - Data Processing** (Next)
-- CSV data models
-- Data processing services
-- API endpoints
-
-⏳ **Phase 3 - Web Interface** (Planned)
-- HTML templates
-- Data visualization tables
-
-## Development Commands
-
-### Running Tests
-```bash
-# Run all tests (when implemented)
-python manage.py test
-
-# Run with pytest and coverage
-pytest tests/ -v --cov
-```
-
-### Code Quality
-```bash
-# Format code
-black .
-
-# Sort imports
-isort .
-
-# Check code style
-flake8 .
-
-# Run all quality checks
-black . && isort . && flake8 .
-```
-
-### Development Server
-```bash
-# Run development server
-python manage.py runserver
-
-# Run with specific port
-python manage.py runserver 8080
-```
-
-## Contributing
-
-1. Follow PEP 8 style guidelines
-2. Write tests for new functionality
-3. Ensure all tests pass before committing
-4. Use meaningful commit messages
-
-## License
-
-This project is developed as part of the Quorum coding challenge.
+- `core/` Django settings
+- `legislative/` app (models, serializers, views, urls, templates, commands)
+- `csv_data/` input CSVs
+- `tests/` pytest suite
